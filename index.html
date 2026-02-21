@@ -13,59 +13,41 @@
         :root { --bg-color: #050505; --text-color: #e0e0e0; --accent-purple: #9d4edd; --terminal-green: #00ff41; --gojo-blue: #00d4ff; --black-flash: #ff003c; }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg-color); color: var(--text-color); font-family: 'Courier New', monospace; overflow-x: hidden; transition: 0.3s; }
         
-        /* Negative Color Effect */
+        /* ⚡ Effects */
         .negative-effect { filter: invert(1) hue-rotate(180deg); }
+        .shake-active { animation: blackFlashStrike 0.2s linear 3; }
+        @keyframes blackFlashStrike { 0%, 100% { transform: translate(0,0); } 20% { transform: translate(-15px, 15px); } 40% { transform: translate(15px, -15px); } 60% { transform: translate(-15px, -15px); } 80% { transform: translate(15px, 15px); } }
 
-        /* Overlays & Background */
-        #video-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10000; display: none; background: black; }
-        #domain-video { width: 100%; height: 100%; object-fit: cover; }
-        #six-eyes-trail { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9000; }
-        .energy-particle { position: absolute; width: 10px; height: 10px; background: var(--gojo-blue); border-radius: 50%; box-shadow: 0 0 15px var(--gojo-blue); transition: transform 0.4s ease, opacity 0.4s ease; }
-
-        #main-content { display: none; padding: 15px 15px 280px 15px; background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('1000101960.jpg'); background-size: cover; background-position: center; background-attachment: fixed; min-height: 100vh; }
-        .module-box { border: 1px solid var(--accent-purple); padding: 15px; margin: 20px 0; background: rgba(0,0,0,0.85); text-align: center; border-radius: 8px; box-shadow: 0 0 10px rgba(157, 78, 221, 0.2); }
+        /* Background & Content */
+        #main-content { display: none; padding: 15px 15px 280px 15px; background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('1000101960.jpg'); background-size: cover; background-position: center; background-attachment: fixed; min-height: 100vh; }
+        .module-box { border: 1px solid var(--accent-purple); padding: 15px; margin: 20px 0; background: rgba(0,0,0,0.9); text-align: center; border-radius: 8px; }
         
-        /* Grids */
         .mission-archive, #community-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-        .mission-photo, .community-photo { width: 100%; border-radius: 4px; border: 1px solid var(--accent-purple); aspect-ratio: 1/1; object-fit: cover; filter: blur(5px) grayscale(1); transition: 0.3s; }
+        .mission-photo, .community-photo { width: 100%; border-radius: 4px; border: 1px solid var(--accent-purple); aspect-ratio: 1/1; object-fit: cover; filter: blur(10px) grayscale(1); transition: 0.4s; }
         .mission-photo:hover, .community-photo:hover { filter: blur(0) grayscale(0); border-color: var(--gojo-blue); }
 
-        /* Upgraded Button UI */
+        /* Buttons UI */
         .music-player { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(5,5,5,0.98); border-top: 2px solid var(--accent-purple); padding: 20px 0; text-align: center; z-index: 100; display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
-        .music-btn { 
-            background: rgba(157, 78, 221, 0.1); border: 1px solid var(--accent-purple); color: #fff; 
-            padding: 12px 18px; cursor: pointer; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; 
-            border-radius: 6px; box-shadow: 0 0 8px rgba(157, 78, 221, 0.4); transition: 0.3s; 
-        }
-        .music-btn:hover { background: var(--accent-purple); box-shadow: 0 0 15px var(--accent-purple); transform: translateY(-2px); }
+        .music-btn { background: rgba(157, 78, 221, 0.1); border: 1px solid var(--accent-purple); color: #fff; padding: 10px 15px; cursor: pointer; font-size: 0.7rem; font-weight: bold; border-radius: 4px; transition: 0.3s; }
+        .music-btn:hover { background: var(--accent-purple); box-shadow: 0 0 15px var(--accent-purple); }
 
-        /* Black Flash Mini-Game Circle */
-        #bf-target {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            border-radius: 50%; border: 4px solid var(--black-flash); background: rgba(255, 0, 60, 0.3);
-            animation: growCircle 1.2s forwards; cursor: crosshair; z-index: 20000; display: none;
-        }
-        @keyframes growCircle { 0% { width: 10px; height: 10px; opacity: 1; } 100% { width: 300px; height: 300px; opacity: 0; } }
+        /* Black Flash Circle Game */
+        #bf-target { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 50%; border: 4px solid var(--black-flash); background: rgba(255, 0, 60, 0.2); animation: growCircle 1.2s forwards; z-index: 20000; display: none; }
+        @keyframes growCircle { 0% { width: 10px; height: 10px; opacity: 1; } 100% { width: 400px; height: 400px; opacity: 0; } }
         
-        @keyframes blackFlashStrike {
-            0% { transform: translate(0,0); } 20% { transform: translate(-20px, 20px); }
-            40% { transform: translate(20px, -20px); } 60% { transform: translate(-20px, -20px); }
-            80% { transform: translate(20px, 20px); } 100% { transform: translate(0,0); }
-        }
-        .shake-active { animation: blackFlashStrike 0.2s linear 2; }
-        .falling-emoji { position: fixed; top: -50px; font-size: 2.5rem; z-index: 15000; transition: transform 2s linear; }
+        .falling-emoji { position: fixed; top: -50px; font-size: 2.5rem; z-index: 15000; transition: transform 2.2s linear; }
+        #video-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10000; display: none; background: black; }
     </style>
 </head>
 <body id="main-body" onmousemove="createTrail(event)" ontouchmove="createTrail(event.touches[0])">
 
-    <div id="video-overlay"><video id="domain-video" src="domain_expansion.mp4"></video></div>
+    <div id="video-overlay"><video id="domain-video" style="width:100%;height:100%;object-fit:cover;" src="domain_expansion.mp4"></video></div>
     <div id="six-eyes-trail"></div>
-    
     <div id="bf-target" onclick="checkBlackFlashHit()"></div>
 
     <div id="intro-screen" style="position:fixed;width:100%;height:100%;background:black;z-index:11000;display:flex;flex-direction:column;justify-content:center;align-items:center;">
-        <button class="music-btn" style="font-size:1.5rem; border-color:var(--gojo-blue); box-shadow: 0 0 15px var(--gojo-blue);" onclick="startDomain()">INTERESTED</button>
-        <button class="music-btn" style="margin-top:20px; border-color:gray; color:gray; box-shadow:none;" onclick="notInterested(this)">NOT INTERESTED</button>
+        <button class="music-btn" style="font-size:1.5rem; border-color:var(--gojo-blue);" onclick="startDomain()">INTERESTED</button>
+        <button class="music-btn" style="margin-top:20px; color:gray; border-color:gray;" onclick="notInterested(this)">NOT INTERESTED</button>
     </div>
 
     <div id="main-content">
@@ -76,11 +58,10 @@
         </div>
 
         <div class="module-box" style="border-color: var(--terminal-green);">
-            <h3>INUMAKI TECHNIQUE 🗣️</h3>
-            <p style="font-size: 0.7rem; color: gray;">Try: "reveal", "sleep", "blast", "stop", "die"</p>
-            <input type="text" id="cursed-input" placeholder="Speak command..." style="background:black; border:1px solid var(--terminal-green); color:var(--terminal-green); padding:10px; width:80%; text-align:center; border-radius: 4px;">
-            <br><br>
-            <button class="music-btn" style="border-color:var(--terminal-green); box-shadow: 0 0 8px var(--terminal-green);" onclick="executeCursedSpeech()">RELEASE</button>
+            <h3>CURSED SPEECH 🗣️</h3>
+            <p style="font-size:0.6rem; color:gray;">Commands: reveal, sleep, wake, blast, stop, die</p>
+            <input type="text" id="cursed-input" placeholder="Command..." style="background:black; border:1px solid var(--terminal-green); color:var(--terminal-green); padding:10px; width:70%; text-align:center;">
+            <button class="music-btn" style="border-color:var(--terminal-green);" onclick="executeCursedSpeech()">RELEASE</button>
         </div>
 
         <div id="hidden-archive" style="display: none;">
@@ -105,18 +86,18 @@
                 <h3>COMMUNITY MEMORIES 🌀</h3>
                 <input type="file" id="up" style="display:none;" onchange="upload(this)">
                 <button class="music-btn" style="border-color: var(--gojo-blue);" onclick="document.getElementById('up').click()">UPLOAD MEMORY</button>
-                <div id="upload-status" style="font-size:0.6rem;margin-top:10px;"></div>
+                <div id="upload-status"></div>
                 <div id="community-grid"></div>
             </div>
         </div>
 
-        <div id="unsealed-section" class="module-box" style="display: none; border-color: gold;">
-            <h3 style="color: gold;">UNSEALED MESSAGES 📜</h3>
-            <p>The time has come. All bound vows are now visible.</p>
-            </div>
+        <div id="unsealed-section" class="module-box" style="display:none; border-color: gold; color: gold;">
+            <h3>UNSEALED MESSAGES 📜</h3>
+            <p>Bound vows are now visible to the world.</p>
+        </div>
 
         <div class="music-player">
-            <button class="music-btn" style="border-color: var(--black-flash);" onclick="startBlackFlashGame()">BLACK FLASH ⚡</button>
+            <button class="music-btn" style="border-color: var(--black-flash);" onclick="startBFGame()">BLACK FLASH ⚡</button>
             <button class="music-btn" onclick="playDV()">GOJO VS SUKUNA 🤞</button>
             <button class="music-btn" onclick="nextTrack()">NEXT TRACK ⏩</button>
         </div>
@@ -125,117 +106,77 @@
     <audio id="bg-music" loop src="Lady Gaga - Judas - GOJO VS SUKUNA.mp3"></audio>
 
     <script>
-        // FIREBASE SETUP
         const firebaseConfig = {
             apiKey: "AIzaSyBxJd_atjhj9OqZCqjvWe_35EJH",
-            authDomain: "gojo-archive.firebaseapp.com",
             projectId: "gojo-archive",
             storageBucket: "gojo-archive.firebasestorage.app",
-            messagingSenderId: "83853315706",
             appId: "1:83853315706:web:d881046437197a5c6d36e2"
         };
         firebase.initializeApp(firebaseConfig);
         const storage = firebase.storage(), db = firebase.firestore(), auth = firebase.auth();
 
-        // EXACT PLAYLIST
         const playlist = [
             "Lady Gaga - Judas - GOJO VS SUKUNA.mp3",
             "SPECIALZ Song of King Gnu ‧ 2023.mp3",
             "TUCA DONKA - CURSEDEVIL, DJ FKU, Skorde.mp3"
         ];
-        let currentTrackIdx = 0;
+        let trackIdx = 0;
 
         function nextTrack() {
-            const player = document.getElementById('bg-music');
-            currentTrackIdx = (currentTrackIdx + 1) % playlist.length;
-            player.src = playlist[currentTrackIdx];
-            player.play();
+            const aud = document.getElementById('bg-music');
+            trackIdx = (trackIdx + 1) % playlist.length;
+            aud.src = playlist[trackIdx];
+            aud.play();
         }
 
-        // INTERACTIVE BLACK FLASH
-        let bfActive = false;
-        function startBlackFlashGame() {
-            if (bfActive) return;
-            bfActive = true;
+        function startBFGame() {
             const target = document.getElementById('bf-target');
             target.style.display = 'block';
-            
-            // Remove it if they miss the window
-            setTimeout(() => {
-                if (bfActive) {
-                    target.style.display = 'none';
-                    bfActive = false;
-                }
-            }, 1200);
+            setTimeout(() => { target.style.display = 'none'; }, 1200);
         }
 
         function checkBlackFlashHit() {
             const target = document.getElementById('bf-target');
-            const rect = target.getBoundingClientRect();
-            
-            // If they click when the circle is between 100px and 250px (Timing required)
-            if (rect.width > 100 && rect.width < 250) {
-                // SUCCESS
+            const size = target.offsetWidth;
+            if(size > 150 && size < 350) {
                 document.body.classList.add('negative-effect', 'shake-active');
-                setTimeout(() => document.body.classList.remove('negative-effect', 'shake-active'), 1000);
+                setTimeout(() => document.body.classList.remove('negative-effect', 'shake-active'), 1200);
             } else {
-                // FAIL
-                const msg = document.createElement('div');
-                msg.innerText = "Missed the spark.";
-                msg.style.cssText = "position:fixed; top:40%; left:50%; transform:translate(-50%,-50%); color:var(--black-flash); font-weight:bold; z-index:20000;";
-                document.body.appendChild(msg);
-                setTimeout(() => msg.remove(), 1000);
+                alert("The spark failed.");
             }
             target.style.display = 'none';
-            bfActive = false;
         }
 
-        // CURSED SPEECH & HIDDEN ARCHIVE
         function executeCursedSpeech() {
             const cmd = document.getElementById('cursed-input').value.toLowerCase().trim();
-            const body = document.getElementById('main-body');
-            
-            if (cmd === "reveal") {
-                document.getElementById('hidden-archive').style.display = 'block';
-                document.getElementById('cursed-input').value = "";
-            } 
-            else if (cmd === "sleep") { body.style.opacity = "0.2"; }
-            else if (cmd === "wake") { body.style.opacity = "1"; }
-            else if (cmd === "blast") { body.classList.add('shake-active'); setTimeout(() => body.classList.remove('shake-active'), 500); }
-            else if (cmd === "hide") { document.getElementById('hidden-archive').style.display = 'none'; }
-            else if (cmd === "stop") { alert("Time frozen."); }
-            else if (cmd === "die") { document.body.innerHTML = "<div style='background:black;height:100vh;display:flex;align-items:center;justify-content:center;color:white;'><h2>Good night.</h2></div>"; }
-            else { alert("Command unrecognized."); }
+            if(cmd === "reveal") document.getElementById('hidden-archive').style.display = 'block';
+            else if(cmd === "sleep") document.body.style.opacity = "0.2";
+            else if(cmd === "wake") document.body.style.opacity = "1";
+            else if(cmd === "blast") { document.body.classList.add('shake-active'); setTimeout(()=>document.body.classList.remove('shake-active'), 400); }
+            else if(cmd === "die") document.body.innerHTML = "<div style='background:black;height:100vh;display:flex;align-items:center;justify-content:center;color:white;'><h2>Good night.</h2></div>";
+            else alert("Weak command.");
+            document.getElementById('cursed-input').value = "";
         }
 
-        // NOT INTERESTED
-        let shrinkScale = 1.0;
+        let scale = 1.0;
         function notInterested(btn) {
-            shrinkScale -= 0.2;
-            btn.style.transform = `scale(${shrinkScale})`;
-            
+            scale -= 0.2; btn.style.transform = `scale(${scale})`;
             const msg = document.createElement('div');
             msg.innerText = "You're weak?";
-            msg.style.cssText = "position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); color:red; font-size:3rem; font-weight:bold; z-index:20000; font-family:monospace;";
+            msg.style.cssText = "position:fixed; top:40%; left:50%; transform:translate(-50%,-50%); color:red; font-size:3rem; z-index:20000; font-weight:bold;";
             document.body.appendChild(msg);
             setTimeout(() => msg.remove(), 1000);
 
             for(let i=0; i<10; i++) {
-                const emoji = document.createElement('div');
-                emoji.className = 'falling-emoji';
-                emoji.innerText = "😠";
-                emoji.style.left = Math.random() * 100 + "vw";
-                document.body.appendChild(emoji);
-                setTimeout(() => emoji.style.transform = `translateY(${window.innerHeight + 100}px)`, 50);
-                setTimeout(() => emoji.remove(), 2500);
+                const e = document.createElement('div'); e.className = 'falling-emoji'; e.innerText = "😠";
+                e.style.left = Math.random() * 100 + "vw";
+                document.body.appendChild(e);
+                setTimeout(() => e.style.transform = `translateY(${window.innerHeight + 100}px)`, 50);
+                setTimeout(() => e.remove(), 2500);
             }
-
-            if (shrinkScale <= 0.2) {
-                setTimeout(() => { document.body.innerHTML = "<div style='background:black;height:100vh;display:flex;align-items:center;justify-content:center;color:white;'><h2>Good night, Gojo Satoru.</h2></div>"; }, 1000);
-            }
+            if(scale <= 0.2) location.reload();
         }
 
-        // CORE & TIMER LOGIC
         function startDomain() { 
             auth.signInAnonymously();
             document.getElementById('intro-screen').style.display='none'; 
@@ -246,11 +187,10 @@
         }
 
         function updateClock() {
-            const destDate = new Date("July 12, 2026").getTime();
+            const dest = new Date("July 12, 2026").getTime();
             const now = new Date().getTime();
-            const diff = destDate - now;
-            
-            if (diff <= 0) {
+            const diff = dest - now;
+            if(diff <= 0) {
                 document.getElementById("timer").innerText = "THE ARCHIVE IS UNSEALED";
                 document.getElementById("unsealed-section").style.display = "block";
             } else {
@@ -259,23 +199,23 @@
         }
 
         async function upload(input) {
-            const file = input.files[0], status = document.getElementById('upload-status');
-            if(!file) return;
-            status.innerText = "SEALING MEMORY...";
+            const f = input.files[0], s = document.getElementById('upload-status');
+            if(!f) return;
+            s.innerText = "SEALING...";
             const ref = storage.ref(`memories/${Date.now()}`);
-            await ref.put(file);
+            await ref.put(f);
             const url = await ref.getDownloadURL();
-            await db.collection("memories").add({url: url, time: Date.now()});
-            status.innerText = "SUCCESS! ✅"; loadMemories();
+            await db.collection("memories").add({url, time: Date.now()});
+            s.innerText = "DONE! ✅"; loadMemories();
         }
 
         async function loadMemories() {
-            const grid = document.getElementById('community-grid'); grid.innerHTML = "";
+            const g = document.getElementById('community-grid'); g.innerHTML = "";
             const snap = await db.collection("memories").orderBy("time", "desc").get();
-            snap.forEach(doc => {
+            snap.forEach(d => {
                 const img = document.createElement('img');
-                img.src = doc.data().url; img.className = "community-photo";
-                grid.appendChild(img);
+                img.src = d.data().url; img.className = "community-photo";
+                g.appendChild(img);
             });
         }
 
@@ -283,7 +223,6 @@
             const p = document.createElement('div'); p.className = 'energy-particle';
             p.style.left = e.clientX + 'px'; p.style.top = e.clientY + 'px';
             document.getElementById('six-eyes-trail').appendChild(p);
-            setTimeout(() => { p.style.transform = 'scale(0)'; p.style.opacity = '0'; }, 50);
             setTimeout(() => p.remove(), 500);
         }
 
