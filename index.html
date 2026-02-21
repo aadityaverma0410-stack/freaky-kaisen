@@ -11,46 +11,48 @@
 
     <style>
         :root { --bg-color: #050505; --text-color: #e0e0e0; --accent-purple: #9d4edd; --terminal-green: #00ff41; --gojo-blue: #00d4ff; --gojo-red: #ff002b; --gojo-purple: #6a0dad; --black-flash: #ff003c; }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg-color); color: var(--text-color); font-family: 'Courier New', monospace; overflow-x: hidden; transition: 0.3s; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg-color); color: var(--text-color); font-family: 'Courier New', monospace; overflow: hidden; cursor: crosshair; }
         
         /* ⚡ Effects */
         .negative-effect { filter: invert(1) hue-rotate(180deg); }
         .shake-active { animation: blackFlashStrike 0.2s linear 3; }
         @keyframes blackFlashStrike { 0%, 100% { transform: translate(0,0); } 20% { transform: translate(-15px, 15px); } 40% { transform: translate(15px, -15px); } 60% { transform: translate(-15px, -15px); } 80% { transform: translate(15px, 15px); } }
 
-        /* 🌌 Unlimited Void Starfield Canvas */
-        #unlimited-void-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9998; display: none; pointer-events: none; background: black; }
+        /* 🌌 Starfield Canvas */
+        #void-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9998; display: none; background: black; pointer-events: none; }
 
-        /* Background & Content */
-        #main-content { display: none; padding: 15px 15px 280px 15px; background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('1000101960.jpg'); background-size: cover; background-position: center; background-attachment: fixed; min-height: 100vh; }
-        .module-box { border: 1px solid var(--accent-purple); padding: 15px; margin: 20px 0; background: rgba(0,0,0,0.9); text-align: center; border-radius: 8px; position: relative; }
+        /* UI Containers */
+        #main-content { display: none; padding: 15px 15px 280px 15px; background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('1000101960.jpg'); background-size: cover; background-position: center; background-attachment: fixed; min-height: 100vh; overflow-y: auto; height: 100%; }
+        .module-box { border: 1px solid var(--accent-purple); padding: 15px; margin: 20px 0; background: rgba(0,0,0,0.9); text-align: center; border-radius: 8px; }
         
+        /* Interactive Images */
         .mission-archive, #community-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-        .interactive-img { width: 100%; border-radius: 4px; border: 1px solid var(--accent-purple); aspect-ratio: 1/1; object-fit: cover; filter: blur(10px) grayscale(1); transition: transform 0.2s ease-out, opacity 0.3s, filter 0.4s; }
+        .interactive-img { width: 100%; border-radius: 4px; border: 1px solid var(--accent-purple); aspect-ratio: 1/1; object-fit: cover; filter: blur(10px) grayscale(1); transition: transform 0.2s, opacity 0.3s; }
+        .interactive-img.unlocked { filter: blur(0) grayscale(0); }
 
-        /* Controls */
-        .music-player { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(5,5,5,0.98); border-top: 2px solid var(--accent-purple); padding: 20px 0; text-align: center; z-index: 100; display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
-        .music-btn { background: rgba(157, 78, 221, 0.1); border: 1px solid var(--accent-purple); color: #fff; padding: 10px 15px; cursor: pointer; font-size: 0.7rem; font-weight: bold; border-radius: 4px; transition: 0.3s; }
-        .music-btn:hover { background: var(--accent-purple); box-shadow: 0 0 15px var(--accent-purple); }
+        /* Cinematic Text */
+        #cinematic-msg { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 3rem; font-weight: bold; color: white; z-index: 30000; text-shadow: 0 0 20px #000; pointer-events: none; opacity: 0; transition: 0.3s; text-align: center; }
 
-        #bf-target { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 50%; border: 4px solid var(--black-flash); background: rgba(255, 0, 60, 0.2); animation: growCircle 1.2s forwards; z-index: 20000; display: none; }
-        @keyframes growCircle { 0% { width: 10px; height: 10px; opacity: 1; } 100% { width: 400px; height: 400px; opacity: 0; } }
-        
-        #video-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10000; display: none; background: black; }
-        .energy-particle { position: absolute; width: 12px; height: 12px; border-radius: 50%; pointer-events: none; transition: transform 0.4s ease, opacity 0.4s ease; }
-        .falling-emoji { position: fixed; top: -50px; font-size: 2.5rem; z-index: 15000; transition: transform 2.2s linear; pointer-events: none; }
+        /* Player UI */
+        .music-player { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(5,5,5,0.98); border-top: 2px solid var(--accent-purple); padding: 20px 0; text-align: center; z-index: 100; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        .music-btn { background: rgba(157, 78, 221, 0.1); border: 1px solid var(--accent-purple); color: #fff; padding: 10px 15px; cursor: pointer; border-radius: 4px; font-size: 0.7rem; font-weight: bold; }
+
+        #six-eyes-trail { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10000; }
+        .energy-particle { position: absolute; width: 15px; height: 15px; border-radius: 50%; pointer-events: none; transition: transform 0.4s, opacity 0.4s; }
+        .falling-emoji { position: fixed; top: -50px; font-size: 2.5rem; z-index: 15000; transition: transform 2s linear; }
     </style>
 </head>
 <body id="main-body" onmousemove="handleMove(event)" ontouchmove="handleMove(event.touches[0])">
 
-    <canvas id="unlimited-void-canvas"></canvas>
-    <div id="video-overlay"><video id="domain-video" style="width:100%;height:100%;object-fit:cover;" src="domain_expansion.mp4"></video></div>
-    <div id="six-eyes-trail" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9000;"></div>
-    <div id="bf-target" onclick="checkBlackFlashHit()"></div>
+    <canvas id="void-canvas"></canvas>
+    <div id="cinematic-msg"></div>
+    <div id="video-overlay" style="display:none; position:fixed; width:100%; height:100%; z-index:20000; background:black;"><video id="domain-video" style="width:100%;height:100%;object-fit:cover;" src="domain_expansion.mp4"></video></div>
+    <div id="six-eyes-trail"></div>
+    <div id="bf-target" style="position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); border-radius:50%; border:4px solid var(--black-flash); display:none; z-index:25000;"></div>
 
     <div id="intro-screen" style="position:fixed;width:100%;height:100%;background:black;z-index:11000;display:flex;flex-direction:column;justify-content:center;align-items:center;">
-        <button class="music-btn" style="font-size:1.5rem; border-color:var(--gojo-blue);" onclick="startDomain()">INTERESTED</button>
-        <button class="music-btn" style="margin-top:20px; color:gray; border-color:gray;" onclick="notInterested(this)">NOT INTERESTED</button>
+        <button class="music-btn" style="font-size:1.5rem;" onclick="startDomain()">INTERESTED</button>
+        <button id="not-interested-btn" class="music-btn" style="margin-top:20px; border-color:gray; color:gray;" onclick="notInterested(this)">NOT INTERESTED</button>
     </div>
 
     <div id="main-content">
@@ -62,22 +64,20 @@
 
         <div class="module-box" style="border-color: var(--gojo-purple);">
             <h3>CURSED SPEECH 🗣️</h3>
-            <p style="font-size:0.6rem; color:gray;">Commands: reveal, blue, red, purple, neutral</p>
+            <p style="font-size:0.6rem; color:gray;">Try: reveal, blue, red, purple, isoh, neutral</p>
             <input type="text" id="cursed-input" placeholder="Command..." style="background:black; border:1px solid var(--gojo-purple); color:var(--gojo-purple); padding:10px; width:70%; text-align:center;">
-            <button class="music-btn" style="border-color:var(--gojo-purple);" onclick="executeCursedSpeech()">RELEASE</button>
+            <button class="music-btn" onclick="executeCursedSpeech()">RELEASE</button>
         </div>
 
         <div id="hidden-archive" style="display: none;">
             <div class="module-box">
                 <h3>MISSION ARCHIVE</h3>
                 <div class="mission-archive">
-                    <img src="IMG_20251217_161226926.jpg" class="interactive-img">
-                    <img src="IMG_20251018_174718968.jpg" class="interactive-img">
-                    <img src="IMG-20251018-WA0075.jpg" class="interactive-img">
-                    <img src="IMG-20251018-WA0061.jpg" class="interactive-img">
-                    <img src="IMG_20251217_154353312_HDR.jpg" class="interactive-img">
-                    <img src="IMG-20251217-WA0338.jpg" class="interactive-img">
-                    <img src="IMG-20251218-WA0395.jpg" class="interactive-img">
+                    <img src="IMG_20251217_161226926.jpg" class="interactive-img" onclick="nullifyImage(this)">
+                    <img src="IMG_20251018_174718968.jpg" class="interactive-img" onclick="nullifyImage(this)">
+                    <img src="IMG-20251018-WA0075.jpg" class="interactive-img" onclick="nullifyImage(this)">
+                    <img src="IMG-20251018-WA0061.jpg" class="interactive-img" onclick="nullifyImage(this)">
+                    <img src="IMG_20251217_154353312_HDR.jpg" class="interactive-img" onclick="nullifyImage(this)">
                 </div>
             </div>
             <div id="community-grid" class="mission-archive"></div>
@@ -97,41 +97,42 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore(), auth = firebase.auth();
 
+        let technique = "neutral", trackIdx = 0, scale = 1.0;
         const playlist = ["Lady Gaga - Judas - GOJO VS SUKUNA.mp3", "SPECIALZ Song of King Gnu ‧ 2023.mp3", "TUCA DONKA - CURSEDEVIL, DJ FKU, Skorde.mp3"];
-        let trackIdx = 0, technique = "neutral";
 
-        // --- 🌌 UNLIMITED VOID STARFIELD LOGIC ---
-        const canvas = document.getElementById('unlimited-void-canvas');
+        // --- 🌌 Unlimited Void Starfield Logic ---
+        const canvas = document.getElementById('void-canvas');
         const ctx = canvas.getContext('2d');
-        let stars = [];
+        let stars = [], voidActive = false;
 
         function initStars() {
             canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            stars = [];
-            for (let i = 0; i < 200; i++) {
-                stars.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, size: Math.random() * 2, speed: Math.random() * 3 + 1 });
-            }
+            stars = Array.from({length: 200}, () => ({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 2,
+                speed: Math.random() * 5 + 2
+            }));
         }
 
-        function drawStars() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        function animateStars() {
+            if (!voidActive) return;
+            ctx.fillStyle = "black"; ctx.fillRect(0,0, canvas.width, canvas.height);
             ctx.fillStyle = "white";
             stars.forEach(s => {
-                ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2); ctx.fill();
-                s.y += s.speed; if (s.y > canvas.height) s.y = 0;
+                ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI*2); ctx.fill();
+                s.y += s.speed; if(s.y > canvas.height) s.y = 0;
             });
-            if (canvas.style.display === "block") requestAnimationFrame(drawStars);
+            requestAnimationFrame(animateStars);
         }
 
-        // --- CORE FUNCTIONS ---
-        function playDV() {
-            const ov = document.getElementById('video-overlay'), vid = document.getElementById('domain-video'), aud = document.getElementById('bg-music');
-            aud.pause(); ov.style.display = 'block'; 
-            canvas.style.display = "block"; initStars(); drawStars(); // Start Void
-            vid.play();
-            vid.onended = () => { ov.style.display = 'none'; canvas.style.display = "none"; aud.play(); };
+        function showCinematicMsg(txt, color = "white") {
+            const el = document.getElementById('cinematic-msg');
+            el.innerText = txt; el.style.color = color; el.style.opacity = "1";
+            setTimeout(() => el.style.opacity = "0", 1500);
         }
 
+        // --- Core Techniques ---
         function handleMove(e) {
             createTrail(e);
             if (technique === "neutral") return;
@@ -139,10 +140,10 @@
                 const rect = img.getBoundingClientRect();
                 const dx = e.clientX - (rect.left + rect.width / 2), dy = e.clientY - (rect.top + rect.height / 2), dist = Math.sqrt(dx*dx + dy*dy);
                 if (technique === "purple" && dist < 300) {
-                    const pull = (300 - dist) / 10;
+                    const pull = (300 - dist) / 8;
                     img.style.transform = `translate(${dx/pull}px, ${dy/pull}px) scale(${dist/300})`;
-                    if (dist < 50) img.style.display = "none";
-                } else if (dist < 400) {
+                    if (dist < 45) { img.style.opacity = "0"; setTimeout(() => img.style.display = "none", 300); }
+                } else if (dist < 400 && (technique === "blue" || technique === "red")) {
                     const pull = (400-dist)/12, dir = technique === "blue" ? 1 : -1;
                     img.style.transform = `translate(${(dx/pull)*dir}px, ${(dy/pull)*dir}px)`;
                 }
@@ -152,52 +153,70 @@
         function executeCursedSpeech() {
             const input = document.getElementById('cursed-input');
             const cmd = input.value.toLowerCase().trim(); input.value = "";
-            if (cmd === "reveal") document.getElementById('hidden-archive').style.display = 'block';
-            else if (cmd === "purple") { technique = "purple"; alert("Imaginary Technique: Hollow Purple 🟣"); }
-            else if (cmd === "blue") { technique = "blue"; alert("Cursed Technique: Blue 🌀"); }
-            else if (cmd === "red") { technique = "red"; alert("Cursed Technique: Red 🔴"); }
-            else if (cmd === "neutral") { technique = "neutral"; resetImgs(); alert("Neutral State"); }
+            if (cmd === "reveal") { document.getElementById('hidden-archive').style.display = 'block'; showCinematicMsg("REVEALED", "var(--terminal-green)"); }
+            else if (cmd === "blue") { technique = "blue"; showCinematicMsg("BLUE", "var(--gojo-blue)"); }
+            else if (cmd === "red") { technique = "red"; showCinematicMsg("RED", "var(--gojo-red)"); }
+            else if (cmd === "purple") { technique = "purple"; showCinematicMsg("PURPLE", "var(--gojo-purple)"); }
+            else if (cmd === "isoh") { technique = "isoh"; showCinematicMsg("INVERTED SPEAR", "white"); }
+            else if (cmd === "neutral") { technique = "neutral"; resetImgs(); showCinematicMsg("NEUTRAL"); }
         }
 
-        function resetImgs() { document.querySelectorAll('.interactive-img').forEach(img => { img.style.transform = "translate(0,0) scale(1)"; img.style.display = "block"; }); }
-
-        function startBFGame() { const t = document.getElementById('bf-target'); t.style.display = 'block'; setTimeout(() => { t.style.display = 'none'; }, 1200); }
-
-        function checkBlackFlashHit() {
-            const target = document.getElementById('bf-target');
-            if(target.offsetWidth > 150 && target.offsetWidth < 350) {
-                document.body.classList.add('negative-effect', 'shake-active');
-                setTimeout(() => document.body.classList.remove('negative-effect', 'shake-active'), 1200);
-            }
-            target.style.display = 'none';
-        }
+        function nullifyImage(img) { if (technique === "isoh") { img.style.transform = "scale(0)"; setTimeout(() => img.style.display = "none", 300); } }
+        function resetImgs() { document.querySelectorAll('.interactive-img').forEach(i => { i.style.display="block"; i.style.transform="scale(1) translate(0,0)"; i.style.opacity="1"; }); }
 
         function notInterested(btn) {
-            alert("You're weak?");
-            for(let i=0; i<15; i++) {
+            scale -= 0.15; btn.style.transform = `scale(${scale})`;
+            showCinematicMsg("You're weak?", "red");
+            for(let i=0; i<10; i++) {
                 const e = document.createElement('div'); e.className = 'falling-emoji'; e.innerText = "😠";
                 e.style.left = Math.random()*100+"vw"; document.body.appendChild(e);
                 setTimeout(() => e.style.transform = `translateY(${window.innerHeight+100}px)`, 50);
-                setTimeout(() => e.remove(), 2500);
+                setTimeout(() => e.remove(), 2200);
             }
-            btn.style.transform = "scale(0.5)";
+            if (scale <= 0.2) location.reload();
         }
 
-        function startDomain() { document.getElementById('intro-screen').style.display='none'; document.getElementById('main-content').style.display='block'; document.getElementById('bg-music').play(); setInterval(updateClock, 1000); }
-
-        function updateClock() {
-            const diff = new Date("July 12, 2026").getTime() - new Date().getTime();
-            document.getElementById("timer").innerText = diff <= 0 ? "UNSEALED" : Math.floor(diff/(1000*60*60*24)) + " days until Unsealing";
+        function startBFGame() { 
+            const t = document.getElementById('bf-target'); t.style.display = 'block'; t.style.width="10px"; t.style.height="10px";
+            t.animate([{width: '10px', height: '10px', opacity: 1}, {width: '400px', height: '400px', opacity: 0}], {duration: 1200, fill: 'forwards'});
+            setTimeout(() => t.style.display = 'none', 1200);
         }
 
+        function checkBlackFlashHit() {
+            const t = document.getElementById('bf-target');
+            if (t.offsetWidth > 150 && t.offsetWidth < 300) {
+                document.body.classList.add('negative-effect', 'shake-active');
+                setTimeout(() => document.body.classList.remove('negative-effect', 'shake-active'), 1200);
+            } else { showCinematicMsg("MISS", "gray"); }
+            t.style.display = 'none';
+        }
+
+        function playDV() {
+            const ov = document.getElementById('video-overlay'), vid = document.getElementById('domain-video');
+            document.getElementById('bg-music').pause(); 
+            ov.style.display = 'block'; 
+            voidActive = true; initStars(); animateStars(); canvas.style.display = "block";
+            vid.play();
+            vid.onended = () => { ov.style.display = 'none'; canvas.style.display = "none"; voidActive = false; document.getElementById('bg-music').play(); };
+        }
+
+        function startDomain() { document.getElementById('intro-screen').style.display='none'; document.getElementById('main-content').style.display='block'; document.getElementById('bg-music').play(); loadMemories(); setInterval(updateClock, 1000); }
+        function updateClock() { document.getElementById("timer").innerText = Math.floor((new Date("July 12, 2026") - new Date())/(1000*60*60*24)) + " days until Unsealing"; }
         function createTrail(e) {
             const p = document.createElement('div'); p.className = 'energy-particle';
             p.style.left = e.clientX + 'px'; p.style.top = e.clientY + 'px';
             p.style.background = technique === "blue" ? "var(--gojo-blue)" : (technique === "red" ? "var(--gojo-red)" : (technique === "purple" ? "var(--gojo-purple)" : "white"));
             document.getElementById('six-eyes-trail').appendChild(p); setTimeout(() => p.remove(), 500);
         }
-
         function nextTrack() { const aud = document.getElementById('bg-music'); trackIdx = (trackIdx + 1) % playlist.length; aud.src = playlist[trackIdx]; aud.play(); }
+        async function loadMemories() {
+            const g = document.getElementById('community-grid'); g.innerHTML = "";
+            const snap = await db.collection("memories").orderBy("time", "desc").get();
+            snap.forEach(d => {
+                const img = document.createElement('img'); img.src = d.data().url; img.className = "interactive-img unlocked";
+                g.appendChild(img);
+            });
+        }
     </script>
 </body>
 </html>
