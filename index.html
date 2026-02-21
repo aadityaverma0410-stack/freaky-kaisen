@@ -10,7 +10,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
 
     <style>
-        :root { --bg-color: #050505; --text-color: #e0e0e0; --accent-purple: #9d4edd; --terminal-green: #00ff41; --gojo-blue: #00d4ff; --black-flash: #ff003c; }
+        :root { --bg-color: #050505; --text-color: #e0e0e0; --accent-purple: #9d4edd; --terminal-green: #00ff41; --gojo-blue: #00d4ff; --gojo-red: #ff002b; --gojo-purple: #6a0dad; --black-flash: #ff003c; }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg-color); color: var(--text-color); font-family: 'Courier New', monospace; overflow-x: hidden; transition: 0.3s; }
         
         /* ⚡ Effects */
@@ -20,34 +20,28 @@
 
         /* Background & Content */
         #main-content { display: none; padding: 15px 15px 280px 15px; background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('1000101960.jpg'); background-size: cover; background-position: center; background-attachment: fixed; min-height: 100vh; }
-        .module-box { border: 1px solid var(--accent-purple); padding: 15px; margin: 20px 0; background: rgba(0,0,0,0.9); text-align: center; border-radius: 8px; }
+        .module-box { border: 1px solid var(--accent-purple); padding: 15px; margin: 20px 0; background: rgba(0,0,0,0.9); text-align: center; border-radius: 8px; position: relative; }
         
         .mission-archive, #community-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-        .mission-photo, .community-photo { width: 100%; border-radius: 4px; border: 1px solid var(--accent-purple); aspect-ratio: 1/1; object-fit: cover; filter: blur(10px) grayscale(1); transition: 0.4s; }
-        .mission-photo:hover, .community-photo:hover { filter: blur(0) grayscale(0); border-color: var(--gojo-blue); }
+        .interactive-img { width: 100%; border-radius: 4px; border: 1px solid var(--accent-purple); aspect-ratio: 1/1; object-fit: cover; filter: blur(10px) grayscale(1); transition: transform 0.2s ease-out, opacity 0.3s, filter 0.4s; }
 
-        /* Buttons UI */
+        /* Player UI */
         .music-player { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(5,5,5,0.98); border-top: 2px solid var(--accent-purple); padding: 20px 0; text-align: center; z-index: 100; display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
         .music-btn { background: rgba(157, 78, 221, 0.1); border: 1px solid var(--accent-purple); color: #fff; padding: 10px 15px; cursor: pointer; font-size: 0.7rem; font-weight: bold; border-radius: 4px; transition: 0.3s; }
         .music-btn:hover { background: var(--accent-purple); box-shadow: 0 0 15px var(--accent-purple); }
 
-        /* Black Flash Circle Game */
-        #bf-target { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 50%; border: 4px solid var(--black-flash); background: rgba(255, 0, 60, 0.2); animation: growCircle 1.2s forwards; z-index: 20000; display: none; }
-        @keyframes growCircle { 0% { width: 10px; height: 10px; opacity: 1; } 100% { width: 400px; height: 400px; opacity: 0; } }
-        
-        .falling-emoji { position: fixed; top: -50px; font-size: 2.5rem; z-index: 15000; transition: transform 2.2s linear; }
-        #video-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10000; display: none; background: black; }
+        #six-eyes-trail { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9000; }
+        .energy-particle { position: absolute; width: 12px; height: 12px; border-radius: 50%; pointer-events: none; transition: transform 0.4s ease, opacity 0.4s ease; }
     </style>
 </head>
-<body id="main-body" onmousemove="createTrail(event)" ontouchmove="createTrail(event.touches[0])">
+<body id="main-body" onmousemove="handleMove(event)" ontouchmove="handleMove(event.touches[0])">
 
-    <div id="video-overlay"><video id="domain-video" style="width:100%;height:100%;object-fit:cover;" src="domain_expansion.mp4"></video></div>
+    <div id="video-overlay" style="display:none; position:fixed; width:100%; height:100%; z-index:10000; background:black;"><video id="domain-video" style="width:100%;height:100%;object-fit:cover;" src="domain_expansion.mp4"></video></div>
     <div id="six-eyes-trail"></div>
-    <div id="bf-target" onclick="checkBlackFlashHit()"></div>
 
     <div id="intro-screen" style="position:fixed;width:100%;height:100%;background:black;z-index:11000;display:flex;flex-direction:column;justify-content:center;align-items:center;">
         <button class="music-btn" style="font-size:1.5rem; border-color:var(--gojo-blue);" onclick="startDomain()">INTERESTED</button>
-        <button class="music-btn" style="margin-top:20px; color:gray; border-color:gray;" onclick="notInterested(this)">NOT INTERESTED</button>
+        <button class="music-btn" style="margin-top:20px; color:gray; border-color:gray;" onclick="location.reload()">NOT INTERESTED</button>
     </div>
 
     <div id="main-content">
@@ -57,48 +51,31 @@
             <p id="timer" style="color:var(--terminal-green); font-weight:bold;">SYNCHRONIZING...</p>
         </div>
 
-        <div class="module-box" style="border-color: var(--terminal-green);">
-            <h3>CURSED SPEECH 🗣️</h3>
-            <p style="font-size:0.6rem; color:gray;">Commands: reveal, sleep, wake, blast, stop, die</p>
-            <input type="text" id="cursed-input" placeholder="Command..." style="background:black; border:1px solid var(--terminal-green); color:var(--terminal-green); padding:10px; width:70%; text-align:center;">
-            <button class="music-btn" style="border-color:var(--terminal-green);" onclick="executeCursedSpeech()">RELEASE</button>
+        <div class="module-box" style="border-color: var(--gojo-purple);">
+            <h3>LIMITLESS CONTROL 🗣️</h3>
+            <p style="font-size:0.6rem; color:gray;">Commands: reveal, blue, red, purple, neutral</p>
+            <input type="text" id="cursed-input" placeholder="Command..." style="background:black; border:1px solid var(--gojo-purple); color:var(--gojo-purple); padding:10px; width:70%; text-align:center;">
+            <button class="music-btn" style="border-color:var(--gojo-purple);" onclick="executeCursedSpeech()">RELEASE</button>
         </div>
 
         <div id="hidden-archive" style="display: none;">
             <div class="module-box">
                 <h3>MISSION ARCHIVE</h3>
-                <div class="mission-archive">
-                    <img src="IMG_20251217_161226926.jpg" class="mission-photo">
-                    <img src="IMG_20251018_174718968.jpg" class="mission-photo">
-                    <img src="IMG-20251018-WA0075.jpg" class="mission-photo">
-                    <img src="IMG-20251018-WA0061.jpg" class="mission-photo">
-                    <img src="IMG_20251217_154353312_HDR.jpg" class="mission-photo">
-                    <img src="IMG-20251217-WA0338.jpg" class="mission-photo">
-                    <img src="IMG-20251218-WA0395.jpg" class="mission-photo">
-                    <img src="IMG_20260214_124036_873.jpg" class="mission-photo">
-                    <img src="IMG_20260217_114544_290.jpg" class="mission-photo">
-                    <img src="IMG-20260216-WA0043.jpg" class="mission-photo">
-                    <img src="IMG-20260217-WA0054.jpg" class="mission-photo">
+                <div class="mission-archive" id="mission-grid">
+                    <img src="IMG_20251217_161226926.jpg" class="interactive-img">
+                    <img src="IMG_20251018_174718968.jpg" class="interactive-img">
+                    <img src="IMG-20251018-WA0075.jpg" class="interactive-img">
+                    <img src="IMG-20251018-WA0061.jpg" class="interactive-img">
+                    <img src="IMG_20251217_154353312_HDR.jpg" class="interactive-img">
+                    <img src="IMG-20251217-WA0338.jpg" class="interactive-img">
+                    <img src="IMG-20251218-WA0395.jpg" class="interactive-img">
                 </div>
             </div>
-
-            <div class="module-box" style="border-color: var(--gojo-blue);">
-                <h3>COMMUNITY MEMORIES 🌀</h3>
-                <input type="file" id="up" style="display:none;" onchange="upload(this)">
-                <button class="music-btn" style="border-color: var(--gojo-blue);" onclick="document.getElementById('up').click()">UPLOAD MEMORY</button>
-                <div id="upload-status"></div>
-                <div id="community-grid"></div>
-            </div>
-        </div>
-
-        <div id="unsealed-section" class="module-box" style="display:none; border-color: gold; color: gold;">
-            <h3>UNSEALED MESSAGES 📜</h3>
-            <p>Bound vows are now visible to the world.</p>
+            <div id="community-grid" class="mission-archive"></div>
         </div>
 
         <div class="music-player">
-            <button class="music-btn" style="border-color: var(--black-flash);" onclick="startBFGame()">BLACK FLASH ⚡</button>
-            <button class="music-btn" onclick="playDV()">GOJO VS SUKUNA 🤞</button>
+            <button class="music-btn" onclick="playDV()">DOMAIN EXPANSION 🤞</button>
             <button class="music-btn" onclick="nextTrack()">NEXT TRACK ⏩</button>
         </div>
     </div>
@@ -106,75 +83,80 @@
     <audio id="bg-music" loop src="Lady Gaga - Judas - GOJO VS SUKUNA.mp3"></audio>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyBxJd_atjhj9OqZCqjvWe_35EJH",
-            projectId: "gojo-archive",
-            storageBucket: "gojo-archive.firebasestorage.app",
-            appId: "1:83853315706:web:d881046437197a5c6d36e2"
-        };
+        const firebaseConfig = { apiKey: "AIzaSyBxJd_atjhj9OqZCqjvWe_35EJH", projectId: "gojo-archive", storageBucket: "gojo-archive.firebasestorage.app", appId: "1:83853315706:web:d881046437197a5c6d36e2" };
         firebase.initializeApp(firebaseConfig);
-        const storage = firebase.storage(), db = firebase.firestore(), auth = firebase.auth();
+        const db = firebase.firestore(), auth = firebase.auth();
 
-        const playlist = [
-            "Lady Gaga - Judas - GOJO VS SUKUNA.mp3",
-            "SPECIALZ Song of King Gnu ‧ 2023.mp3",
-            "TUCA DONKA - CURSEDEVIL, DJ FKU, Skorde.mp3"
-        ];
+        let technique = "neutral"; // neutral, blue, red, purple
         let trackIdx = 0;
+        const playlist = ["Lady Gaga - Judas - GOJO VS SUKUNA.mp3", "SPECIALZ Song of King Gnu ‧ 2023.mp3", "TUCA DONKA - CURSEDEVIL, DJ FKU, Skorde.mp3"];
 
-        function nextTrack() {
-            const aud = document.getElementById('bg-music');
-            trackIdx = (trackIdx + 1) % playlist.length;
-            aud.src = playlist[trackIdx];
-            aud.play();
-        }
+        function handleMove(e) {
+            createTrail(e);
+            if (technique === "neutral") return;
 
-        function startBFGame() {
-            const target = document.getElementById('bf-target');
-            target.style.display = 'block';
-            setTimeout(() => { target.style.display = 'none'; }, 1200);
-        }
+            const imgs = document.querySelectorAll('.interactive-img');
+            imgs.forEach(img => {
+                const rect = img.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                const dx = e.clientX - centerX;
+                const dy = e.clientY - centerY;
+                const dist = Math.sqrt(dx*dx + dy*dy);
 
-        function checkBlackFlashHit() {
-            const target = document.getElementById('bf-target');
-            const size = target.offsetWidth;
-            if(size > 150 && size < 350) {
-                document.body.classList.add('negative-effect', 'shake-active');
-                setTimeout(() => document.body.classList.remove('negative-effect', 'shake-active'), 1200);
-            } else {
-                alert("The spark failed.");
-            }
-            target.style.display = 'none';
+                if (technique === "purple") {
+                    // PURPLE: Sucks in and Erases
+                    if (dist < 300) {
+                        const pull = (300 - dist) / 10;
+                        img.style.transform = `translate(${dx / pull}px, ${dy / pull}px) scale(${dist / 300})`;
+                        if (dist < 50) { 
+                            img.style.opacity = "0"; 
+                            setTimeout(() => img.style.display = "none", 300);
+                        }
+                    }
+                } else if (dist < 400) {
+                    // BLUE & RED: Pull or Push
+                    const pull = (400 - dist) / 12;
+                    const dir = technique === "blue" ? 1 : -1;
+                    img.style.transform = `translate(${(dx / pull) * dir}px, ${(dy / pull) * dir}px)`;
+                }
+            });
         }
 
         function executeCursedSpeech() {
-            const cmd = document.getElementById('cursed-input').value.toLowerCase().trim();
-            if(cmd === "reveal") document.getElementById('hidden-archive').style.display = 'block';
-            else if(cmd === "sleep") document.body.style.opacity = "0.2";
-            else if(cmd === "wake") document.body.style.opacity = "1";
-            else if(cmd === "blast") { document.body.classList.add('shake-active'); setTimeout(()=>document.body.classList.remove('shake-active'), 400); }
-            else if(cmd === "die") document.body.innerHTML = "<div style='background:black;height:100vh;display:flex;align-items:center;justify-content:center;color:white;'><h2>Good night.</h2></div>";
-            else alert("Weak command.");
-            document.getElementById('cursed-input').value = "";
+            const input = document.getElementById('cursed-input');
+            const cmd = input.value.toLowerCase().trim();
+            input.value = "";
+
+            if (cmd === "reveal") document.getElementById('hidden-archive').style.display = 'block';
+            else if (cmd === "purple") { technique = "purple"; alert("Imaginary Technique: Hollow Purple 🟣"); }
+            else if (cmd === "blue") { technique = "blue"; alert("Cursed Technique: Blue 🌀"); }
+            else if (cmd === "red") { technique = "red"; alert("Cursed Technique: Red 🔴"); }
+            else if (cmd === "neutral") { technique = "neutral"; resetImgs(); alert("Neutral State"); }
         }
 
-        let scale = 1.0;
-        function notInterested(btn) {
-            scale -= 0.2; btn.style.transform = `scale(${scale})`;
-            const msg = document.createElement('div');
-            msg.innerText = "You're weak?";
-            msg.style.cssText = "position:fixed; top:40%; left:50%; transform:translate(-50%,-50%); color:red; font-size:3rem; z-index:20000; font-weight:bold;";
-            document.body.appendChild(msg);
-            setTimeout(() => msg.remove(), 1000);
+        function resetImgs() {
+            document.querySelectorAll('.interactive-img').forEach(img => {
+                img.style.transform = "translate(0,0) scale(1)";
+                img.style.opacity = "1";
+                img.style.display = "block";
+            });
+        }
 
-            for(let i=0; i<10; i++) {
-                const e = document.createElement('div'); e.className = 'falling-emoji'; e.innerText = "😠";
-                e.style.left = Math.random() * 100 + "vw";
-                document.body.appendChild(e);
-                setTimeout(() => e.style.transform = `translateY(${window.innerHeight + 100}px)`, 50);
-                setTimeout(() => e.remove(), 2500);
-            }
-            if(scale <= 0.2) location.reload();
+        function createTrail(e) {
+            const p = document.createElement('div');
+            p.className = 'energy-particle';
+            p.style.left = e.clientX + 'px';
+            p.style.top = e.clientY + 'px';
+            
+            // Color based on technique
+            if(technique === "blue") p.style.background = "var(--gojo-blue)";
+            else if(technique === "red") p.style.background = "var(--gojo-red)";
+            else if(technique === "purple") p.style.background = "var(--gojo-purple)";
+            else p.style.background = "white";
+
+            document.getElementById('six-eyes-trail').appendChild(p);
+            setTimeout(() => p.remove(), 500);
         }
 
         function startDomain() { 
@@ -182,31 +164,13 @@
             document.getElementById('intro-screen').style.display='none'; 
             document.getElementById('main-content').style.display='block'; 
             document.getElementById('bg-music').play(); 
-            loadMemories(); 
-            setInterval(updateClock, 1000); 
+            loadMemories();
         }
 
-        function updateClock() {
-            const dest = new Date("July 12, 2026").getTime();
-            const now = new Date().getTime();
-            const diff = dest - now;
-            if(diff <= 0) {
-                document.getElementById("timer").innerText = "THE ARCHIVE IS UNSEALED";
-                document.getElementById("unsealed-section").style.display = "block";
-            } else {
-                document.getElementById("timer").innerText = Math.floor(diff/(1000*60*60*24)) + " days until Unsealing";
-            }
-        }
-
-        async function upload(input) {
-            const f = input.files[0], s = document.getElementById('upload-status');
-            if(!f) return;
-            s.innerText = "SEALING...";
-            const ref = storage.ref(`memories/${Date.now()}`);
-            await ref.put(f);
-            const url = await ref.getDownloadURL();
-            await db.collection("memories").add({url, time: Date.now()});
-            s.innerText = "DONE! ✅"; loadMemories();
+        function nextTrack() {
+            const aud = document.getElementById('bg-music');
+            trackIdx = (trackIdx + 1) % playlist.length;
+            aud.src = playlist[trackIdx]; aud.play();
         }
 
         async function loadMemories() {
@@ -214,16 +178,9 @@
             const snap = await db.collection("memories").orderBy("time", "desc").get();
             snap.forEach(d => {
                 const img = document.createElement('img');
-                img.src = d.data().url; img.className = "community-photo";
+                img.src = d.data().url; img.className = "interactive-img";
                 g.appendChild(img);
             });
-        }
-
-        function createTrail(e) {
-            const p = document.createElement('div'); p.className = 'energy-particle';
-            p.style.left = e.clientX + 'px'; p.style.top = e.clientY + 'px';
-            document.getElementById('six-eyes-trail').appendChild(p);
-            setTimeout(() => p.remove(), 500);
         }
 
         function playDV() {
