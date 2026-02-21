@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jujutsu High | Archive Tanish</title>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --text-color: #e0e0e0;
+            --accent-purple: #9d4edd;
+            --accent-red: #ff002b;
+            --terminal-green: #00ff41;
+            --gojo-blue: #00d4ff;
+            --aura-color: var(--accent-purple);
+        }
+
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Courier New', Courier, monospace;
+            overflow-x: hidden;
+        }
+
+        /* --- Six Eyes Visuals --- */
+        #six-eyes-trail {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 5000;
+        }
+        .energy-particle {
+            position: absolute; width: 8px; height: 8px;
+            background: var(--gojo-blue); border-radius: 50%;
+            box-shadow: 0 0 10px var(--gojo-blue);
+            opacity: 1; transition: transform 0.5s ease, opacity 0.5s ease;
+        }
+
+        /* --- Black Flash Mini-Game --- */
+        #black-flash-zone {
+            border: 2px solid var(--accent-red); padding: 15px;
+            margin: 20px 0; text-align: center; background: rgba(0,0,0,0.8);
+        }
+        .flash-target {
+            width: 60px; height: 60px; border-radius: 50%;
+            margin: 10px auto; background: white;
+            animation: pulseTarget 1s infinite alternate;
+            cursor: pointer;
+        }
+        @keyframes pulseTarget { from { transform: scale(0.8); } to { transform: scale(1.2); } }
+        .black-flash-active { animation: blackFlashAnim 0.3s forwards; }
+        @keyframes blackFlashAnim { 0% { background: white; } 100% { background: black; box-shadow: 0 0 40px var(--accent-red); } }
+
+        /* --- Binding Vow Guestbook --- */
+        #binding-vow-section {
+            border: 2px dashed var(--terminal-green); padding: 15px;
+            margin: 20px 0; background: rgba(0,255,65,0.05);
+        }
+        #vow-status { color: var(--accent-red); font-weight: bold; }
+
+        /* --- UI Components --- */
+        #main-content {
+            display: none; padding: 15px 15px 240px 15px;
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('1000101960.jpg');
+            background-size: cover; background-position: center; background-attachment: fixed;
+        }
+        .music-player { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(10,10,10,0.98); border-top: 2px solid var(--aura-color); padding: 15px; text-align: center; z-index: 100; }
+        .music-btn { background: none; border: 1px solid var(--aura-color); color: var(--aura-color); padding: 8px 12px; margin: 5px; cursor: pointer; }
+        .profile-container { text-align: center; border: 2px solid var(--aura-color); padding: 20px; background: rgba(0,0,0,0.9); }
+        #video-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 3000; display: none; background: black; }
+        #domain-video { width: 100%; height: 100%; object-fit: cover; }
+    </style>
+</head>
+<body onmousemove="createSixEyesTrail(event)" ontouchmove="createSixEyesTrail(event.touches[0])">
+
+    <div id="video-overlay"><video id="domain-video" src="domain_expansion.mp4"></video></div>
+    <div id="six-eyes-trail"></div>
+
+    <div id="intro-screen" style="position:fixed; width:100%; height:100%; background:black; z-index:10000; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+        <button class="music-btn" onclick="selectWinner()">INTERESTED</button>
+    </div>
+
+    <div id="main-content">
+        <div class="profile-container">
+            <img src="Snapchat-1445956652.jpg" style="width:140px; height:140px; border-radius:50%; border:3px solid var(--aura-color); object-fit:cover;">
+            <h1>SORCERER: TANISH</h1>
+            <p id="timer">SYNCHRONIZING...</p>
+        </div>
+
+        <div id="black-flash-zone">
+            <h3>BLACK FLASH TRAINING</h3>
+            <p>Tap when target is at maximum size!</p>
+            <div id="target" class="flash-target" onclick="checkBlackFlash()"></div>
+            <p id="score-display">DIVERGENT FISTS: 0</p>
+        </div>
+
+        <div id="binding-vow-section">
+            <h3>BINDING VOW: THE SEALED ARCHIVE</h3>
+            <p id="vow-status">SEALED UNTIL JULY 12, 2026</p>
+            <textarea id="vow-input" placeholder="Type a message to seal..." style="width:90%; background:#000; color:#fff; border:1px solid #00ff41; padding:10px;"></textarea>
+            <button class="music-btn" onclick="sealMessage()">SEAL MESSAGE 📜</button>
+        </div>
+
+        <div class="music-player">
+            <button class="music-btn" onclick="nextSong()">NEXT TRACK ⏩</button>
+            <button class="music-btn" style="background:var(--aura-color); color:black;" onclick="playVideo()">DOMAIN EXPANSION</button>
+        </div>
+    </div>
+
+    <audio id="bg-music" loop src="Lady Gaga - Judas - GOJO VS SUKUNA.mp3"></audio>
+
+    <script>
+        const targetDate = new Date("July 12, 2026 00:00:00").getTime();
+        let score = 0;
+
+        function selectWinner() {
+            document.getElementById('intro-screen').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+            document.getElementById('bg-music').play();
+            setInterval(updateTimer, 1000);
+        }
+
+        function createSixEyesTrail(e) {
+            const particle = document.createElement('div');
+            particle.className = 'energy-particle';
+            particle.style.left = e.clientX + 'px';
+            particle.style.top = e.clientY + 'px';
+            document.getElementById('six-eyes-trail').appendChild(particle);
+            setTimeout(() => { particle.style.transform = 'scale(0)'; particle.style.opacity = '0'; }, 50);
+            setTimeout(() => particle.remove(), 600);
+        }
+
+        function checkBlackFlash() {
+            const target = document.getElementById('target');
+            target.classList.add('black-flash-active');
+            score++;
+            document.getElementById('score-display').innerText = `BLACK FLASHES: ${score}`;
+            document.body.style.filter = "invert(1)";
+            setTimeout(() => { 
+                document.body.style.filter = "invert(0)"; 
+                target.classList.remove('black-flash-active');
+            }, 200);
+        }
+
+        function sealMessage() {
+            const input = document.getElementById('vow-input');
+            if(input.value) {
+                alert("Binding Vow established. Message sealed until July 12.");
+                input.value = "";
+            }
+        }
+
+        function updateTimer() {
+            const now = new Date().getTime();
+            const diff = targetDate - now;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            document.getElementById("timer").innerHTML = days + "d remaining until Deployment";
+        }
+
+        function playVideo() {
+            const overlay = document.getElementById('video-overlay');
+            const video = document.getElementById('domain-video');
+            overlay.style.display = 'block';
+            video.play();
+            video.onended = () => overlay.style.display = 'none';
+        }
+
+        function nextSong() {
+            // Placeholder for song logic from previous build
+            alert("Switching Sorcerer Aura...");
+        }
+    </script>
+</body>
+</html>
