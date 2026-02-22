@@ -1,218 +1,280 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jujutsu High | The Cursed Archive</title>
-    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-storage-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jujutsu High | Gojo Archive</title>
 
-    <style>
-        :root { 
-            --bg-color: #050505; --text-color: #e0e0e0; 
-            --gojo-blue: #00d4ff; --sukuna-red: #ff002b; 
-            --yuta-purple: #9d4edd; --itadori-pink: #ff69b4;
-            --terminal-green: #00ff41; --black-flash: #ff003c;
-        }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg-color); color: var(--text-color); font-family: 'Courier New', monospace; overflow: hidden; cursor: crosshair; }
-        
-        /* ⚡ Effects */
-        .negative-effect { filter: invert(1) hue-rotate(180deg); }
-        .shake-active { animation: blackFlashStrike 0.15s linear infinite; }
-        .frozen { pointer-events: none !important; filter: grayscale(1) blur(2px) !important; transition: 0.5s; }
-        @keyframes blackFlashStrike { 0%, 100% { transform: translate(0,0); } 25% { transform: translate(-10px, 10px); } 50% { transform: translate(10px, -10px); } 75% { transform: translate(-10px, -10px); } }
+<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
 
-        /* Background & Content */
-        #main-content { display: none; padding: 15px 15px 280px 15px; background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('1000101960.jpg'); background-size: cover; background-position: center; background-attachment: fixed; min-height: 100vh; overflow-y: auto; height: 100%; }
-        .module-box { border: 1px solid var(--yuta-purple); padding: 15px; margin: 20px 0; background: rgba(0,0,0,0.9); text-align: center; border-radius: 8px; }
-        
-        /* 👁️ Hover Reveal Photos */
-        .mission-archive, #community-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-        .interactive-img { width: 100%; border-radius: 4px; border: 1px solid var(--yuta-purple); aspect-ratio: 1/1; object-fit: cover; filter: blur(20px) grayscale(1); transition: 0.4s ease; }
-        .interactive-img:hover { filter: blur(0) grayscale(0); border-color: var(--gojo-blue); transform: scale(1.05); z-index: 10; }
+<style>
+:root{
+--bg-color:#050505;
+--accent-purple:#9d4edd;
+--terminal-green:#00ff41;
+--gojo-blue:#00d4ff;
+--black-flash:#ff003c;
+}
 
-        /* Digital Clock */
-        #live-clock { font-size: 1.1rem; color: var(--terminal-green); text-shadow: 0 0 10px var(--terminal-green); margin-bottom: 5px; }
+body,html{
+margin:0;
+padding:0;
+background:var(--bg-color);
+color:white;
+font-family:Courier New,monospace;
+overflow-x:hidden;
+transition:0.3s;
+}
 
-        /* Cinematic Text (Alert Replacement) */
-        #cinematic-msg { position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%); font-size: 3.5rem; font-weight: bold; color: white; z-index: 30000; text-shadow: 0 0 20px #000; pointer-events: none; opacity: 0; transition: 0.3s; text-align: center; }
+.negative-effect{filter:invert(1) hue-rotate(180deg);}
+.six-eyes-mode{background:#001f33 !important;}
 
-        /* Buttons */
-        .music-player { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(5,5,5,0.98); border-top: 2px solid var(--yuta-purple); padding: 20px 0; text-align: center; z-index: 100; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
-        .music-btn { background: rgba(0,0,0,0.5); border: 2px solid; color: #fff; padding: 10px 15px; cursor: pointer; border-radius: 4px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; transition: 0.3s; }
-        .btn-itadori { border-color: var(--black-flash); box-shadow: 0 0 5px var(--black-flash); }
-        .btn-gojo { border-color: var(--gojo-blue); box-shadow: 0 0 5px var(--gojo-blue); }
-        .btn-sukuna { border-color: var(--sukuna-red); box-shadow: 0 0 5px var(--sukuna-red); }
-        .btn-yuta { border-color: var(--yuta-purple); box-shadow: 0 0 5px var(--yuta-purple); }
-        .music-btn:hover { background: #fff; color: #000; transform: translateY(-3px); }
+.module-box{
+border:1px solid var(--accent-purple);
+padding:15px;
+margin:20px 0;
+background:rgba(0,0,0,0.85);
+text-align:center;
+border-radius:8px;
+}
 
-        /* Black Flash Game */
-        #bf-target { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 50%; border: 6px solid var(--black-flash); background: rgba(255, 0, 60, 0.2); z-index: 25000; display: none; }
-        @keyframes growCircle { 0% { width: 20px; height: 20px; opacity: 1; } 100% { width: 450px; height: 450px; opacity: 0; } }
+.music-player{
+position:fixed;
+bottom:0;
+left:0;
+width:100%;
+background:#050505;
+border-top:2px solid var(--accent-purple);
+padding:15px;
+display:flex;
+flex-wrap:wrap;
+gap:10px;
+justify-content:center;
+}
 
-        .falling-emoji { position: fixed; top: -50px; font-size: 2.5rem; z-index: 15000; transition: transform 2.2s linear; pointer-events: none; }
-    </style>
+.music-btn{
+background:rgba(157,78,221,0.1);
+border:1px solid var(--accent-purple);
+color:white;
+padding:10px 15px;
+cursor:pointer;
+border-radius:6px;
+font-size:0.75rem;
+}
+
+.music-btn:hover{
+background:var(--accent-purple);
+}
+
+#bf-target{
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+border-radius:50%;
+border:4px solid var(--black-flash);
+background:rgba(255,0,60,0.3);
+animation:growCircle 1.2s forwards;
+display:none;
+z-index:9999;
+}
+
+@keyframes growCircle{
+0%{width:10px;height:10px;opacity:1;}
+100%{width:300px;height:300px;opacity:0;}
+}
+
+#system-message{
+position:fixed;
+top:40%;
+left:50%;
+transform:translate(-50%,-50%);
+background:black;
+padding:20px 30px;
+border:1px solid var(--terminal-green);
+display:none;
+z-index:20000;
+border-radius:8px;
+}
+
+#infinity-orb{
+position:fixed;
+top:20%;
+right:5%;
+width:80px;
+height:80px;
+border-radius:50%;
+background:radial-gradient(circle,var(--gojo-blue),transparent);
+box-shadow:0 0 40px var(--gojo-blue);
+animation:floatOrb 4s infinite ease-in-out;
+z-index:5000;
+}
+
+@keyframes floatOrb{
+0%{transform:translateY(0px);}
+50%{transform:translateY(-20px);}
+100%{transform:translateY(0px);}
+}
+
+</style>
 </head>
-<body id="main-body" onmousemove="handleMove(event)" ontouchmove="handleMove(event.touches[0])">
 
-    <div id="cinematic-msg"></div>
-    <div id="video-overlay" style="display:none; position:fixed; width:100%; height:100%; z-index:20000; background:black;"><video id="domain-video" style="width:100%;height:100%;object-fit:cover;" src="domain_expansion.mp4"></video></div>
-    <div id="six-eyes-trail" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9000;"></div>
-    <div id="bf-target" onclick="checkBlackFlashHit(event)"></div>
+<body id="main-body">
 
-    <div id="intro-screen" style="position:fixed;width:100%;height:100%;background:black;z-index:11000;display:flex;flex-direction:column;justify-content:center;align-items:center;">
-        <button class="music-btn btn-gojo" style="font-size:1.5rem;" onclick="startDomain()">ENTER THE ARCHIVE</button>
-        <button class="music-btn" style="margin-top:20px; color:gray; border-color:gray;" onclick="notInterested(this)">NOT INTERESTED</button>
-    </div>
+<div id="system-message"></div>
+<div id="bf-target" onclick="checkBlackFlashHit()"></div>
+<div id="infinity-orb"></div>
 
-    <div id="main-content">
-        <div class="module-box">
-            <div id="live-clock">00:00:00</div>
-            <img src="Snapchat-1445956652.jpg" style="width:100px;height:100px;border-radius:50%;border:3px solid var(--gojo-blue); object-fit: cover;">
-            <h1 style="color: var(--gojo-blue);">SORCERER: TANISH</h1>
-            <p id="timer" style="color:var(--terminal-green); font-weight:bold;">SYNCHRONIZING...</p>
-        </div>
+<div id="main-content" style="padding:15px 15px 200px 15px;">
 
-        <div class="module-box" style="border-color: var(--terminal-green);">
-            <h3>CURSED SPEECH 🗣️</h3>
-            <p style="font-size:0.6rem; color:gray;">reveal, stop, blue, red, purple, neutral</p>
-            <input type="text" id="cursed-input" placeholder="Speak command..." style="background:black; border:1px solid var(--terminal-green); color:var(--terminal-green); padding:10px; width:70%; text-align:center;">
-            <br><br>
-            <button class="music-btn" style="border-color: var(--terminal-green);" onclick="executeCursedSpeech()">RELEASE</button>
-        </div>
+<div class="module-box">
+<h1>SORCERER: TANISH</h1>
+<p id="timer" style="color:var(--terminal-green);font-weight:bold;">Loading...</p>
+<p id="rank-display" style="color:var(--gojo-blue);">Grade 4 Sorcerer</p>
+</div>
 
-        <div id="hidden-archive" style="display: none;">
-            <div class="module-box">
-                <h3>MISSION ARCHIVE</h3>
-                <div class="mission-archive">
-                    <img src="IMG_20251217_161226926.jpg" class="interactive-img">
-                    <img src="IMG_20251018_174718968.jpg" class="interactive-img">
-                    <img src="IMG-20251018-WA0075.jpg" class="interactive-img">
-                    <img src="IMG-20251018-WA0061.jpg" class="interactive-img">
-                    <img src="IMG_20251217_154353312_HDR.jpg" class="interactive-img">
-                </div>
-            </div>
-            <div id="community-grid" class="mission-archive"></div>
-        </div>
+<div class="module-box">
+<h3>VISITOR COUNT 👥</h3>
+<p id="visitor-count">Loading...</p>
+</div>
 
-        <div class="music-player">
-            <button class="music-btn btn-itadori" onclick="startBFGame()">BLACK FLASH ⚡</button>
-            <button class="music-btn btn-sukuna" onclick="playDV()">DOMAIN EXPANSION 🤞</button>
-            <button class="music-btn btn-yuta" onclick="nextTrack()">NEXT TRACK ⏩</button>
-        </div>
-    </div>
+<div class="module-box">
+<h3>INUMAKI TECHNIQUE</h3>
+<input type="text" id="cursed-input" placeholder="Speak command..."
+style="background:black;border:1px solid var(--terminal-green);color:var(--terminal-green);padding:10px;width:80%;text-align:center;">
+<br><br>
+<button class="music-btn" onclick="executeCursedSpeech()">RELEASE</button>
+</div>
 
-    <audio id="bg-music" loop src="Lady Gaga - Judas - GOJO VS SUKUNA.mp3"></audio>
+<div class="music-player">
+<button class="music-btn" onclick="startBlackFlashGame()">BLACK FLASH ⚡</button>
+<button class="music-btn" onclick="toggleSixEyes()">SIX EYES 👁️</button>
+<button class="music-btn" onclick="nextTrack()">NEXT TRACK ⏩</button>
+</div>
 
-    <script>
-        const firebaseConfig = { apiKey: "AIzaSyBxJd_atjhj9OqZCqjvWe_35EJH", projectId: "gojo-archive", storageBucket: "gojo-archive.firebasestorage.app", appId: "1:83853315706:web:d881046437197a5c6d36e2" };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore(), auth = firebase.auth();
+</div>
 
-        let technique = "neutral", trackIdx = 0, scale = 1.0;
-        const playlist = ["Lady Gaga - Judas - GOJO VS SUKUNA.mp3", "SPECIALZ Song of King Gnu ‧ 2023.mp3", "TUCA DONKA - CURSEDEVIL, DJ FKU, Skorde.mp3"];
+<audio id="bg-music" loop src="Lady Gaga - Judas - GOJO VS SUKUNA.mp3"></audio>
 
-        function showCinematicMsg(txt, color = "white") {
-            const el = document.getElementById('cinematic-msg');
-            el.innerText = txt; el.style.color = color; el.style.opacity = "1";
-            setTimeout(() => el.style.opacity = "0", 1500);
-        }
+<script>
+const firebaseConfig={
+apiKey:"AIzaSyBxJd_atjhj9OqZCqjvWe_35EJH",
+authDomain:"gojo-archive.firebaseapp.com",
+projectId:"gojo-archive",
+storageBucket:"gojo-archive.firebasestorage.app",
+messagingSenderId:"83853315706",
+appId:"1:83853315706:web:d881046437197a5c6d36e2"
+};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.firestore();
+firebase.auth().signInAnonymously();
 
-        // --- BLACK FLASH GAME ---
-        function startBFGame() {
-            const t = document.getElementById('bf-target');
-            t.style.display = 'block'; t.style.width = '20px'; t.style.height = '20px';
-            t.style.animation = "growCircle 1.2s forwards linear";
-            setTimeout(() => { if(t.style.display === 'block') { t.style.display = 'none'; showCinematicMsg("MISS", "gray"); } }, 1200);
-        }
+function showMessage(text,color="#00ff41"){
+const box=document.getElementById("system-message");
+box.style.borderColor=color;
+box.style.color=color;
+box.innerText=text;
+box.style.display="block";
+setTimeout(()=>box.style.display="none",1500);
+}
 
-        function checkBlackFlashHit(e) {
-            e.stopPropagation();
-            const t = document.getElementById('bf-target');
-            if (t.offsetWidth > 180 && t.offsetWidth < 330) {
-                document.body.classList.add('negative-effect', 'shake-active');
-                showCinematicMsg("⚡ BLACK FLASH ⚡", "var(--black-flash)");
-                setTimeout(() => document.body.classList.remove('negative-effect', 'shake-active'), 1500);
-            } else { showCinematicMsg("FAILED", "gray"); }
-            t.style.display = 'none'; t.style.animation = 'none';
-        }
+function updateClock(){
+const dest=new Date("July 12, 2026 00:00:00").getTime();
+const now=new Date().getTime();
+const diff=dest-now;
+if(diff<=0){
+document.getElementById("timer").innerText="THE ARCHIVE IS UNSEALED";
+return;
+}
+const d=Math.floor(diff/(1000*60*60*24));
+const h=Math.floor((diff/(1000*60*60))%24);
+const m=Math.floor((diff/(1000*60))%60);
+const s=Math.floor((diff/1000)%60);
+document.getElementById("timer").innerText=
+`${d} days | ${h.toString().padStart(2,"0")}:${m.toString().padStart(2,"0")}:${s.toString().padStart(2,"0")}`;
+}
+setInterval(updateClock,1000);
+updateClock();
 
-        function executeCursedSpeech() {
-            const input = document.getElementById('cursed-input');
-            const cmd = input.value.toLowerCase().trim(); input.value = "";
-            if (cmd === "reveal") { document.getElementById('hidden-archive').style.display = 'block'; showCinematicMsg("REVEALED", "var(--terminal-green)"); }
-            else if (cmd === "stop") { document.getElementById('main-content').classList.toggle('frozen'); showCinematicMsg("DON'T MOVE", "var(--terminal-green)"); }
-            else if (cmd === "blue") { technique = "blue"; showCinematicMsg("BLUE", "var(--gojo-blue)"); }
-            else if (cmd === "red") { technique = "red"; showCinematicMsg("RED", "var(--sukuna-red)"); }
-            else if (cmd === "purple") { technique = "purple"; showCinematicMsg("PURPLE", "var(--yuta-purple)"); }
-            else if (cmd === "neutral") { technique = "neutral"; showCinematicMsg("NEUTRAL"); }
-        }
+let sixEyes=false;
+function toggleSixEyes(){
+sixEyes=!sixEyes;
+document.body.classList.toggle("six-eyes-mode");
+showMessage(sixEyes?"Six Eyes Activated":"Six Eyes Deactivated","#00d4ff");
+}
 
-        function notInterested(btn) {
-            scale -= 0.15; btn.style.transform = `scale(${scale})`;
-            showCinematicMsg("You're weak?", "red");
-            for(let i=0; i<12; i++) {
-                const e = document.createElement('div'); e.className = 'falling-emoji'; e.innerText = "😠";
-                e.style.left = Math.random()*100+"vw"; document.body.appendChild(e);
-                setTimeout(() => e.style.transform = `translateY(${window.innerHeight+100}px)`, 50);
-                setTimeout(() => e.remove(), 2500);
-            }
-            if (scale <= 0.2) { 
-                document.body.innerHTML = "<div style='background:black;height:100vh;display:flex;align-items:center;justify-content:center;color:white;'><h2>Good night, Gojo Satoru.</h2></div>";
-            }
-        }
+let bfScore=0;
+function startBlackFlashGame(){
+document.getElementById("bf-target").style.display="block";
+setTimeout(()=>document.getElementById("bf-target").style.display="none",1200);
+}
 
-        function handleMove(e) {
-            createTrail(e);
-            if (technique === "neutral") return;
-            document.querySelectorAll('.interactive-img').forEach(img => {
-                const rect = img.getBoundingClientRect();
-                const dx = e.clientX - (rect.left + rect.width / 2), dy = e.clientY - (rect.top + rect.height / 2), dist = Math.sqrt(dx*dx + dy*dy);
-                if (dist < 400) {
-                    const pull = (400-dist)/12, dir = technique === "blue" ? 1 : (technique === "red" ? -1 : 0);
-                    img.style.transform = technique === "purple" ? `scale(${dist/400}) translate(${dx/10}px, ${dy/10}px)` : `translate(${(dx/pull)*dir}px, ${(dy/pull)*dir}px)`;
-                }
-            });
-        }
+function checkBlackFlashHit(){
+bfScore++;
+updateRank();
+document.body.classList.add("negative-effect");
+setTimeout(()=>document.body.classList.remove("negative-effect"),500);
+showMessage("BLACK FLASH!","#ff003c");
+document.getElementById("bf-target").style.display="none";
+}
 
-        function startDomain() { 
-            document.getElementById('intro-screen').style.display='none'; 
-            document.getElementById('main-content').style.display='block';
-            document.getElementById('bg-music').play();
-            setInterval(updateClock, 1000); loadMemories();
-        }
+function updateRank(){
+let rank="Grade 4 Sorcerer";
+if(bfScore>3) rank="Grade 2 Sorcerer";
+if(bfScore>6) rank="Semi-Grade 1";
+if(bfScore>10) rank="Special Grade";
+document.getElementById("rank-display").innerText=rank;
+}
 
-        function updateClock() {
-            const now = new Date();
-            document.getElementById("live-clock").innerText = now.toLocaleDateString() + " | " + now.toLocaleTimeString();
-            document.getElementById("timer").innerText = Math.floor((new Date("July 12, 2026") - now)/(1000*60*60*24)) + " days until Unsealing";
-        }
+function executeCursedSpeech(){
+const cmd=document.getElementById("cursed-input").value.toLowerCase().trim();
+if(cmd==="invert") document.body.classList.toggle("negative-effect");
+else if(cmd==="stop") showMessage("Time Frozen","#00d4ff");
+else if(cmd==="limitless") for(let i=0;i<50;i++) spawnParticle();
+else if(cmd==="gravity") document.body.style.transform="rotate(180deg)";
+else if(cmd==="infinity") showMessage("Admin Access Granted","#gold");
+else showMessage("Command Unrecognized","#ff003c");
+}
 
-        function createTrail(e) {
-            const p = document.createElement('div'); p.style.cssText = `position:absolute; width:12px; height:12px; border-radius:50%; background:white; pointer-events:none; left:${e.clientX}px; top:${e.clientY}px; z-index:10000; box-shadow: 0 0 10px white; transition: 0.5s;`;
-            document.getElementById('six-eyes-trail').appendChild(p);
-            setTimeout(() => { p.style.opacity = "0"; p.style.transform = "scale(0)"; }, 100);
-            setTimeout(() => p.remove(), 500);
-        }
+function spawnParticle(){
+const p=document.createElement("div");
+p.style.position="fixed";
+p.style.width="6px";
+p.style.height="6px";
+p.style.background="#00d4ff";
+p.style.left=Math.random()*window.innerWidth+"px";
+p.style.top=Math.random()*window.innerHeight+"px";
+document.body.appendChild(p);
+setTimeout(()=>p.remove(),1000);
+}
 
-        function nextTrack() { const aud = document.getElementById('bg-music'); trackIdx = (trackIdx + 1) % playlist.length; aud.src = playlist[trackIdx]; aud.play(); }
+async function updateVisitors(){
+const ref=db.collection("stats").doc("visits");
+await db.runTransaction(async t=>{
+const doc=await t.get(ref);
+if(!doc.exists) t.set(ref,{count:1});
+else t.update(ref,{count:doc.data().count+1});
+});
+const snap=await ref.get();
+document.getElementById("visitor-count").innerText=snap.data().count;
+}
+updateVisitors();
 
-        function playDV() {
-            const ov = document.getElementById('video-overlay'), vid = document.getElementById('domain-video');
-            document.getElementById('bg-music').pause(); ov.style.display = 'block'; vid.play();
-            vid.onended = () => { ov.style.display = 'none'; document.getElementById('bg-music').play(); };
-        }
+const playlist=[
+"Lady Gaga - Judas - GOJO VS SUKUNA.mp3",
+"SPECIALZ Song of King Gnu ‧ 2023.mp3",
+"TUCA DONKA - CURSEDEVIL, DJ FKU, Skorde.mp3"
+];
+let trackIndex=0;
+function nextTrack(){
+trackIndex=(trackIndex+1)%playlist.length;
+document.getElementById("bg-music").src=playlist[trackIndex];
+document.getElementById("bg-music").play();
+}
+</script>
 
-        async function loadMemories() {
-            const g = document.getElementById('community-grid'); g.innerHTML = "";
-            const snap = await db.collection("memories").orderBy("time", "desc").get();
-            snap.forEach(d => {
-                const img = document.createElement('img'); img.src = d.data().url; img.className = "interactive-img";
-                g.appendChild(img);
-            });
-        }
-    </script>
 </body>
 </html>
